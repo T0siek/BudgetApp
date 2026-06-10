@@ -22,8 +22,14 @@ const ConfirmModal = ({
                       }: ConfirmModalProps) => {
     if (!visible) return null;
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+    const handleOverlayKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Escape') {
+            onCancel();
+        }
+    };
+
+    const handleOverlayClick = (e: React.MouseEvent) => {
+        if (e.target === e.currentTarget) {
             onCancel();
         }
     };
@@ -32,23 +38,31 @@ const ConfirmModal = ({
         <div
             className={styles.modalOverlay}
             role="presentation"
-            onClick={onCancel}
-            onKeyDown={handleKeyDown}
+            onClick={handleOverlayClick}
+            onKeyDown={handleOverlayKeyDown}
         >
             <div
                 className={styles.modal}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="confirm-modal-title"
-                onClick={(event) => event.stopPropagation()}
             >
                 <h3 id="confirm-modal-title">{title}</h3>
                 <p>{message}</p>
                 <div className={styles.actions}>
-                    <button type="button" className={styles.cancel} onClick={onCancel}>
+                    <button
+                        type="button"
+                        className={styles.cancel}
+                        onClick={onCancel}
+                        autoFocus
+                    >
                         {cancelLabel}
                     </button>
-                    <button type="button" className={styles.confirm} onClick={onConfirm}>
+                    <button
+                        type="button"
+                        className={styles.confirm}
+                        onClick={onConfirm}
+                    >
                         {confirmLabel}
                     </button>
                 </div>
