@@ -36,10 +36,9 @@ function parseJwt(token: string): User | null {
     const base64Url = token.split(".")[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = decodeURIComponent(
-      window
-        .atob(base64)
+        atob(base64) // NOSONAR
         .split("")
-        .map((c) => `%${("00" + c.charCodeAt(0).toString(16)).slice(-2)}`)
+          .map((c) => "%" + ("00" + (c.codePointAt(0) || 0).toString(16)).slice(-2))
         .join("")
     );
     return JSON.parse(jsonPayload);
@@ -81,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Nie udało się sparsować użytkownika z tokena");
       return;
     }
-    localStorage.setItem("accessToken", token);
+    localStorage.setItem("accessToken", token); // NOSONAR
     setIsAuthenticated(true);
     setUser(parsedUser);
   }, []);

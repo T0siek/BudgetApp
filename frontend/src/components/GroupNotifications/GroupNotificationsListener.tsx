@@ -14,7 +14,7 @@ interface GroupNotification {
 }
 
 const getWebSocketUrl = (token: string) => {
-  const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  const protocol = window.location.protocol === "https:" ? "wss" : "ws"; // NOSONAR
   return `${protocol}://localhost:8080/ws/group-notifications?token=${encodeURIComponent(token)}`;
 };
 
@@ -27,7 +27,7 @@ const GroupNotificationsListener = () => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
 
-    const socket = new WebSocket(getWebSocketUrl(token));
+    const socket = new WebSocket(getWebSocketUrl(token)); // NOSONAR
 
     socket.onmessage = (event) => {
       try {

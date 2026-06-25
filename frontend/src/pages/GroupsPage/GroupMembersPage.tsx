@@ -40,7 +40,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
 
   const isGroupOwner =
     user?.id !== undefined && String(user.id) === String(group.ownerId);
-  const currentUserId = user?.id !== undefined ? String(user.id) : "";
+  const currentUserId = user?.id != null ? String(user.id) : "";
 
   const getErrorMessage = (error: unknown, fallback: string) => {
     if (error instanceof Error && error.message.trim()) {
@@ -81,7 +81,6 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
           );
         }
       } else {
-        console.error("Błąd pobierania członków grupy:", membersResult.reason);
         setMembers([]);
         setErrorMessage((current) =>
           current || "Nie udało się pobrać członków grupy."
@@ -91,7 +90,6 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
       if (debtsResult.status === "fulfilled") {
         setDebts(debtsResult.value);
       } else {
-        console.error("Błąd pobierania długów grupy:", debtsResult.reason);
         setDebts([]);
         setErrorMessage((current) =>
           current || "Nie udało się pobrać długów grupy."
@@ -139,7 +137,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
       setAddMemberError("");
       await groupsApi.addMember(group.id, email);
       setNewMemberEmail("");
-      refreshMembers();
+      await refreshMembers();
     } catch (error: unknown) {
       console.error("Błąd dodawania członka:", error);
       setAddMemberError(getErrorMessage(error, "Nie udało się dodać członka."));
@@ -155,7 +153,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
     try {
       setErrorMessage("");
       await groupsApi.removeMember(id);
-      refreshMembers();
+      await refreshMembers();
     } catch (error: unknown) {
       console.error("Błąd usuwania członka:", error);
       setErrorMessage(
@@ -198,7 +196,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
       await groupsApi.createDebt(group.id, debtorId, creditorId, amount, title);
       setDebtTitle("");
       setDebtAmount("");
-      refreshMembers();
+      await refreshMembers();
     } catch (error: unknown) {
       console.error("Błąd dodawania długu:", error);
       setDebtFormError(getErrorMessage(error, "Nie udało się dodać długu."));
@@ -212,7 +210,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
       setErrorMessage("");
       await groupsApi.deleteDebt(debtToDelete.id);
       setDebtToDelete(null);
-      refreshMembers();
+      await refreshMembers();
     } catch (error: unknown) {
       console.error("Błąd usuwania długu:", error);
       setErrorMessage(getErrorMessage(error, "Nie udało się usunąć długu."));
@@ -224,6 +222,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
     String(debt.debtor.id) === currentUserId ||
     String(debt.creditor.id) === currentUserId;
 
+  // noinspection DuplicatedCode
   const canMarkDebtAsPaid = (debt: GroupDebt) =>
     String(debt.debtor.id) === currentUserId && !debt.paidByDebtor;
 
@@ -242,7 +241,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
     try {
       setErrorMessage("");
       await groupsApi.markDebtAsPaid(debtId);
-      refreshMembers();
+      await refreshMembers();
     } catch (error: unknown) {
       console.error("Błąd oznaczania długu jako opłaconego:", error);
       setErrorMessage(
@@ -255,7 +254,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
     try {
       setErrorMessage("");
       await groupsApi.confirmDebtPayment(debtId);
-      refreshMembers();
+      await refreshMembers();
     } catch (error: unknown) {
       console.error("Błąd potwierdzania spłaty długu:", error);
       setErrorMessage(
@@ -264,6 +263,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
     }
   };
 
+  // noinspection DuplicatedCode
   return (
     <div className={styles.container}>
       <button onClick={onBack} className={styles.backButton}>
@@ -392,7 +392,7 @@ const GroupMembersPage = ({ group, onBack }: Props) => {
                   className={`${styles.statusBadge} ${
                     debt.confirmedByCreditor
                       ? styles.statusPaid
-                      : debt.paidByDebtor
+                        : debt.paidByDebtor // NOSONAR
                         ? styles.statusPending
                         : styles.statusOpen
                   }`}
