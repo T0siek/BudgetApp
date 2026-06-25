@@ -1,3 +1,3 @@
 # Autor
 
-Mateusz Siwak
+Antoni Krawiec
